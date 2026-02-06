@@ -1,0 +1,39 @@
+Copy code
+Python
+import streamlit as st
+import pandas as pd
+import time
+
+st.set_page_config(page_title="Test Licencë Anglisht", layout="centered")
+
+df = pd.read_excel("pyetje.xlsx")
+
+if "index" not in st.session_state:
+    st.session_state.index = 0
+    st.session_state.score = 0
+    st.session_state.start_time = time.time()
+    st.session_state.questions = df.sample(min(50, len(df))).reset_index(drop=True)
+
+q = st.session_state.questions.iloc[st.session_state.index]
+
+st.title("📝 Test për Licencën – Anglisht")
+st.write(f"Pyetja {st.session_state.index + 1} / {len(st.session_state.questions)}")
+st.write(q["question"])
+
+answer = st.radio(
+    "Zgjidh përgjigjen:",
+    ["A", "B", "C", "D"],
+    format_func=lambda x: q[x]
+)
+
+if st.button("Vazhdo"):
+    if answer == q["correct"]:
+        st.session_state.score += 1
+
+    st.session_state.index += 1
+
+    if st.session_state.index >= len(st.session_state.questions):
+        st.success(f"✅ Testi mbaroi! Pikët: {st.session_state.score}")
+        st.stop()
+
+st.write(f"⏱️ Koha: {int(time.time() - st.session_state.start_time)} sekonda")
